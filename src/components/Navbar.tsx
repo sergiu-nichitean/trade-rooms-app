@@ -18,21 +18,24 @@ export const Navbar = () => {
             <div className="rounded-md bg-solana-gradient p-1.5">
               <Bed className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-lg tracking-tight">Trade Rooms</span>
+            <span className="font-bold text-lg tracking-tight">TradeRooms</span>
           </Link>
         </div>
         
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6">
+          <Link to="/login" className="text-sm font-medium hover:text-primary transition-colors">
+            Login
+          </Link>
           <HashLink to="/#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
             How it Works
           </HashLink>
-          <HashLink to="/#hotel-offers" className="text-sm font-medium hover:text-primary transition-colors">
-            Hotel Offers
-          </HashLink>
-          <HashLink to="/#benefits" className="text-sm font-medium hover:text-primary transition-colors">
-            Benefits
-          </HashLink>
+          <Link to="/search" className="text-sm font-medium hover:text-primary transition-colors">
+            Search
+          </Link>
+          <Link to="/redeem" className="text-sm font-medium hover:text-primary transition-colors">
+            Redeem
+          </Link>
           <HashLink to="/#team" className="text-sm font-medium hover:text-primary transition-colors">
             About
           </HashLink>

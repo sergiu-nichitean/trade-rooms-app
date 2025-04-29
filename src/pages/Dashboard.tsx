@@ -23,7 +23,7 @@ const Dashboard = () => {
   
   const toast = useToast();
 
-  const handleTransfer = () => {
+  const handleRedeem = () => {
     if (!currentToken) return;
     
     // Simulate transfer
@@ -33,8 +33,8 @@ const Dashboard = () => {
     setTransferEmail("");
     
     toast.toast({
-      title: "Token Transferred Successfully",
-      description: `Your token has been transferred to ${transferEmail}`,
+      title: "Token Redeemed Successfully",
+      description: `Your token has been redeemed. You will receive an email with your reservation details.`,
     });
   };
 
@@ -43,7 +43,7 @@ const Dashboard = () => {
       <main className="flex-1">
         <div className="container py-8">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Total Value</CardTitle>
@@ -57,7 +57,7 @@ const Dashboard = () => {
               </CardContent>
             </Card>
             
-            <Card>
+            {/* <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Total Savings</CardTitle>
                 <HandCoins className="h-4 w-4 text-muted-foreground" />
@@ -68,7 +68,7 @@ const Dashboard = () => {
                   Compared to retail pricing
                 </p>
               </CardContent>
-            </Card>
+            </Card> */}
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -154,7 +154,7 @@ const Dashboard = () => {
                             }}
                           >
                             <Send className="h-4 w-4 mr-2" />
-                            Transfer
+                            Redeem
                           </Button>
                         </CardFooter>
                       </Card>
@@ -317,9 +317,9 @@ const Dashboard = () => {
       <Dialog open={showTransferDialog} onOpenChange={setShowTransferDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Transfer Hotel Token</DialogTitle>
+            <DialogTitle>Redeem Hotel Token</DialogTitle>
             <DialogDescription>
-              Transfer your token to another user. This action cannot be undone.
+              Redeem your token to use at the hotel. This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           
@@ -338,7 +338,11 @@ const Dashboard = () => {
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Recipient Email</label>
+              <label className="text-sm font-medium">Full Name</label>
+              <Input placeholder="John Doe" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Email</label>
               <Input 
                 placeholder="email@example.com" 
                 value={transferEmail}
@@ -348,7 +352,7 @@ const Dashboard = () => {
             <div className="flex items-start gap-2">
               <User className="h-4 w-4 mt-0.5 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
-                The recipient will receive an email notification with instructions to claim the token.
+                The reservation will be made under the name you provide.
               </p>
             </div>
           </div>
@@ -358,11 +362,11 @@ const Dashboard = () => {
               Cancel
             </Button>
             <Button 
-              onClick={handleTransfer}
+              onClick={handleRedeem}
               disabled={!transferEmail || !transferEmail.includes('@')}
               className="bg-solana-gradient hover:opacity-90"
             >
-              Transfer Token
+              Redeem Token
             </Button>
           </DialogFooter>
         </DialogContent>

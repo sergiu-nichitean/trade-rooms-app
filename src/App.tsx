@@ -20,7 +20,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Signup from "./pages/Signup";
 import Search from "./pages/Search";
-import LoginPage from "./components/LoginPage";
+import Redeem from "./pages/Redeem";
 
 const queryClient = new QueryClient();
 
@@ -42,12 +42,12 @@ const App = () => (
                   <Route path="/marketplace" element={<Marketplace />} />
                   <Route path="/" element={<Index />} />
                   <Route path="/search" element={<Search />} />
-                  <Route path="/login" element={<LoginPage />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/how-it-works" element={<HowItWorks />} />
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/blog/:id" element={<BlogPost />} />
                   <Route path="/signup" element={<Signup />} />
+                  <Route path="/redeem" element={<Redeem />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>

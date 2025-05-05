@@ -24,9 +24,6 @@ export const Navbar = () => {
         
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6">
-          <Link to="/login" className="text-sm font-medium hover:text-primary transition-colors">
-            Login
-          </Link>
           <HashLink to="/#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
             How it Works
           </HashLink>

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 import { Button } from "@/components/ui/button";
-import { Bed, LogIn } from "lucide-react";
+import { Bed, LogIn, Search, LayoutDashboard, Store, HelpCircle, BookOpen, Info } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -24,75 +24,71 @@ export const Navbar = () => {
         
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6">
-          <HashLink to="/#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
-            How it Works
-          </HashLink>
-          <Link to="/search" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link to="/search" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
+            <Search className="h-4 w-4" />
             Search
           </Link>
-          <Link to="/redeem" className="text-sm font-medium hover:text-primary transition-colors">
-            Redeem
+          <Link to="/dashboard" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
+            <LayoutDashboard className="h-4 w-4" />
+            Dashboard
           </Link>
-          <HashLink to="/#team" className="text-sm font-medium hover:text-primary transition-colors">
-            About
+          <Link to="/marketplace" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
+            <Store className="h-4 w-4" />
+            Marketplace
+          </Link>
+          <HashLink to="/#how-it-works" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
+            <HelpCircle className="h-4 w-4" />
+            How It Works
           </HashLink>
-          <Link to="/blog" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link to="/blog" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
+            <BookOpen className="h-4 w-4" />
             Blog
           </Link>
-          <HashLink to="/#faq" className="text-sm font-medium hover:text-primary transition-colors">
-            FAQ
-          </HashLink>
+          <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
+            <Info className="h-4 w-4" />
+            About
+          </Link>
         </nav>
 
-        {/* Hamburger and mobile nav */}
-        <div className="flex items-center gap-4">
-          {/* Mobile menu - only show on small screens */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                aria-label="Open navigation menu"
-              >
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-64 p-0">
-              <div className="flex flex-col h-full">
-                <div className="flex items-center gap-2 px-6 py-5 border-b">
-                  <div className="rounded-md bg-solana-gradient p-1.5">
-                    <Bed className="h-5 w-5 text-white" />
-                  </div>
-                  <span className="font-bold text-lg tracking-tight">Trade Rooms</span>
-                </div>
-                <nav className="flex flex-col gap-2 p-6">
-                  <HashLink to="/#how-it-works" className="py-2 px-1 text-base font-medium hover:text-primary transition-colors">
-                    How it Works
-                  </HashLink>
-                  <HashLink to="/#hotel-offers" className="py-2 px-1 text-base font-medium hover:text-primary transition-colors">
-                    Hotel Offers
-                  </HashLink>
-                  <HashLink to="/#benefits" className="py-2 px-1 text-base font-medium hover:text-primary transition-colors">
-                    Benefits
-                  </HashLink>
-                  <HashLink to="/#team" className="py-2 px-1 text-base font-medium hover:text-primary transition-colors">
-                    About
-                  </HashLink>
-                  <Link to="/blog" className="py-2 px-1 text-base font-medium hover:text-primary transition-colors">
-                    Blog
-                  </Link>
-                  <HashLink to="/#faq" className="py-2 px-1 text-base font-medium hover:text-primary transition-colors">
-                    FAQ
-                  </HashLink>
-                </nav>
-              </div>
-            </SheetContent>
-          </Sheet>
+        {/* Mobile nav */}
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="md:hidden">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right">
+            <nav className="flex flex-col gap-4 mt-8">
+              <Link to="/search" className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
+                <Search className="h-4 w-4" />
+                Search
+              </Link>
+              <Link to="/dashboard" className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
+                <LayoutDashboard className="h-4 w-4" />
+                Dashboard
+              </Link>
+              <Link to="/marketplace" className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
+                <Store className="h-4 w-4" />
+                Marketplace
+              </Link>
+              <Link to="/how-it-works" className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
+                <HelpCircle className="h-4 w-4" />
+                How It Works
+              </Link>
+              <Link to="/blog" className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
+                <BookOpen className="h-4 w-4" />
+                Blog
+              </Link>
+              <Link to="/about" className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
+                <Info className="h-4 w-4" />
+                About
+              </Link>
+            </nav>
+          </SheetContent>
+        </Sheet>
 
-          <div className="flex items-center gap-4">
-            <WalletMultiButton />
-          </div>
+        <div className="flex items-center gap-4">
+          <WalletMultiButton />
         </div>
       </div>
     </header>

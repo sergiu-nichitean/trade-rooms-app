@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Search as SearchIcon, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { HotelListing } from "@/data/hotels";
 
 const Search = () => {
   const [destination, setDestination] = useState("");
@@ -21,8 +23,36 @@ const Search = () => {
 
   const navigate = useNavigate();
 
-  const handleSearch = () => {
-    navigate('/search_results');
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get<HotelListing[]>(`/api/hotels/search`, {
+        params: {
+          query: destination,
+          dateFrom: dateFrom ? format(dateFrom, 'yyyy-MM-dd') : undefined,
+          dateTo: dateTo ? format(dateTo, 'yyyy-MM-dd') : undefined,
+          rooms,
+          adults,
+          children
+        }
+      });
+      
+      navigate('/search_results', { 
+        state: { 
+          searchResults: response.data,
+          searchParams: {
+            destination,
+            dateFrom,
+            dateTo,
+            rooms,
+            adults,
+            children
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error searching hotels:', error);
+      // You might want to show an error message to the user here
+    }
   };
 
   return (

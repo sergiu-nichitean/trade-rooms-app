@@ -21,6 +21,7 @@ import BlogPost from "./pages/BlogPost";
 import Signup from "./pages/Signup";
 import Search from "./pages/Search";
 import Redeem from "./pages/Redeem";
+import BookingDetail from "@/pages/BookingDetail";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => (
                   <Route path="/blog/:id" element={<BlogPost />} />
                   <Route path="/signup" element={<Signup />} />
                   <Route path="/redeem" element={<Redeem />} />
+                  <Route path="/booking/:bookingId" element={<BookingDetail />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>

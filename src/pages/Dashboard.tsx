@@ -140,7 +140,7 @@ const Dashboard = () => {
                         
                         <CardFooter className="grid grid-cols-2 gap-2">
                           <Button asChild variant="outline" size="sm">
-                            <Link to={`/hotel/${hotel.id}`}>
+                            <Link to={`/booking/${hotel.id}`}>
                               <Hotel className="h-4 w-4 mr-2" />
                               Details
                             </Link>

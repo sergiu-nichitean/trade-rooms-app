@@ -1,73 +1,128 @@
-# Welcome to your Lovable project
+# Trade Rooms App
 
-## Project info
+A modern web application for booking and trading hotel stays using NFTs on the Solana blockchain.
 
-**URL**: https://lovable.dev/projects/8d3d0d59-bff9-4c96-80a5-4bdfdc093ef1
+## Features
 
-## How can I edit this code?
+- 🏨 Hotel Search and Booking
+- 🎫 NFT Marketplace for Hotel Stays
+- 💳 Secure Payment Processing
+- 🔐 Wallet Integration
+- 📱 Responsive Design
+- 🎨 Modern UI with shadcn/ui
 
-There are several ways of editing your application.
+## Project Structure
 
-**Use Lovable**
+```
+src/
+├── components/           # Reusable UI components
+│   ├── ui/              # shadcn/ui components
+│   ├── HotelCard.tsx    # Hotel listing card component
+│   ├── Navbar.tsx       # Navigation bar
+│   └── Footer.tsx       # Footer component
+├── pages/               # Page components
+│   ├── Home.tsx         # Landing page
+│   ├── Marketplace.tsx  # NFT marketplace
+│   ├── HotelDetail.tsx  # Hotel details page
+│   ├── BookingDetail.tsx # Booking details page
+│   ├── Search.tsx       # Search page
+│   ├── SearchResults.tsx # Search results page
+│   ├── Dashboard.tsx    # User dashboard
+│   ├── HowItWorks.tsx   # How it works page
+│   ├── Blog.tsx         # Blog listing
+│   ├── BlogPost.tsx     # Individual blog post
+│   ├── Signup.tsx       # Signup page
+│   └── NotFound.tsx     # 404 page
+├── data/                # Mock data and types
+│   ├── hotels.ts        # Hotel data
+│   └── blog.ts          # Blog data
+├── contexts/            # React contexts
+│   └── WalletContext.tsx # Wallet connection context
+├── App.tsx              # Main application component
+└── main.tsx             # Application entry point
+```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/8d3d0d59-bff9-4c96-80a5-4bdfdc093ef1) and start prompting.
+## Technologies Used
 
-Changes made via Lovable will be committed automatically to this repo.
+- ⚡ Vite - Next Generation Frontend Tooling
+- ⚛️ React - A JavaScript library for building user interfaces
+- 📘 TypeScript - JavaScript with syntax for types
+- 🎨 Tailwind CSS - A utility-first CSS framework
+- 🎭 shadcn/ui - Beautifully designed components
+- 🔗 Solana Web3 - Solana blockchain integration
+- 📱 React Router - Declarative routing for React
 
-**Use your preferred IDE**
+## Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Prerequisites
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Node.js (v16 or higher)
+- npm (v7 or higher)
 
-Follow these steps:
+### Installation
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd trade-rooms-app
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. Install dependencies:
+```bash
+npm install
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. Start the development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The application will be available at `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Development
 
-**Use GitHub Codespaces**
+### Available Scripts
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm run format` - Format code with Prettier
 
-## What technologies are used for this project?
+### Environment Variables
 
-This project is built with:
+Create a `.env` file in the root directory with the following variables:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```env
+VITE_SOLANA_RPC_URL=your_solana_rpc_url
+VITE_MARKETPLACE_PROGRAM_ID=your_program_id
+```
 
-## How can I deploy this project?
+## Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/8d3d0d59-bff9-4c96-80a5-4bdfdc093ef1) and click on Share -> Publish.
+The application can be deployed to various platforms:
 
-## Can I connect a custom domain to my Lovable project?
+1. **Vercel** (Recommended)
+   - Install Vercel CLI: `npm i -g vercel`
+   - Run `vercel` to deploy
 
-Yes it is!
+2. **Netlify**
+   - Connect your repository to Netlify
+   - Set build command: `npm run build`
+   - Set publish directory: `dist`
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+3. **GitHub Pages**
+   - Run `npm run build`
+   - Push the `dist` folder to the `gh-pages` branch
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

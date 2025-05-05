@@ -5,18 +5,31 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, SlidersHorizontal, X, Calendar as CalendarIcon, Users } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import MintHotelCard from "@/components/MintHotelCard";
-import { hotels } from "@/data/hotels";
+import { HotelListing } from "@/data/hotels";
 
 const SearchResults = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const location = useLocation();
+  const { searchResults, searchParams } = location.state || { searchResults: [], searchParams: {} };
+  
+  const [searchQuery, setSearchQuery] = useState(searchParams.destination || "");
   const [priceRange, setPriceRange] = useState([0, 500]);
   const [sortBy, setSortBy] = useState("recommended");
   const [showFilters, setShowFilters] = useState(false);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(searchParams.dateFrom);
+  const [dateTo, setDateTo] = useState<Date | undefined>(searchParams.dateTo);
+  const [rooms, setRooms] = useState(searchParams.rooms || 1);
+  const [adults, setAdults] = useState(searchParams.adults || 2);
+  const [children, setChildren] = useState(searchParams.children || 0);
+  const [isGuestsOpen, setIsGuestsOpen] = useState(false);
 
   // Basic filtering and sorting functionality
-  const filteredHotels = hotels.filter(hotel => {
+  const filteredHotels = searchResults.filter((hotel: HotelListing) => {
     // Filter by search query
     const matchesSearch = hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          hotel.location.toLowerCase().includes(searchQuery.toLowerCase());
@@ -24,7 +37,7 @@ const SearchResults = () => {
     // Filter by price range
     const matchesPrice = hotel.tokenPrice >= priceRange[0] && hotel.tokenPrice <= priceRange[1];
     
-    return matchesSearch && matchesPrice && hotel.location == 'London, United Kingdom';
+    return matchesSearch && matchesPrice && hotel.location;
   });
 
   // Sort hotels based on selection
@@ -144,6 +157,143 @@ const SearchResults = () => {
                     <SlidersHorizontal className="h-4 w-4" />
                   </Button>
                 </div>
+              </div>
+
+              {/* Search Fields */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-card rounded-lg border p-4">
+                {/* Date From */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !dateFrom && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dateFrom ? format(dateFrom, "PPP") : <span>Check in</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dateFrom}
+                      onSelect={setDateFrom}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                {/* Date To */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !dateTo && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dateTo ? format(dateTo, "PPP") : <span>Check out</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dateTo}
+                      onSelect={setDateTo}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                {/* Guests */}
+                <Popover open={isGuestsOpen} onOpenChange={setIsGuestsOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      {rooms} Room{rooms > 1 ? 's' : ''}, {adults + children} Guest{adults + children > 1 ? 's' : ''}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80 p-4">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Rooms</p>
+                          <p className="text-sm text-muted-foreground">Number of rooms</p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setRooms(Math.max(1, rooms - 1))}
+                          >
+                            -
+                          </Button>
+                          <span>{rooms}</span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setRooms(rooms + 1)}
+                          >
+                            +
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Adults</p>
+                          <p className="text-sm text-muted-foreground">Ages 13 or above</p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setAdults(Math.max(1, adults - 1))}
+                          >
+                            -
+                          </Button>
+                          <span>{adults}</span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setAdults(adults + 1)}
+                          >
+                            +
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Children</p>
+                          <p className="text-sm text-muted-foreground">Ages 0-12</p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setChildren(Math.max(0, children - 1))}
+                          >
+                            -
+                          </Button>
+                          <span>{children}</span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setChildren(children + 1)}
+                          >
+                            +
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
               
               {/* Mobile Filters */}

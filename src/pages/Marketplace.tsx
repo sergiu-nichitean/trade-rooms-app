@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { hotels } from "@/data/hotels";
+import { hotels, HotelListing } from "@/data/hotels";
 import { Slider } from "@/components/ui/slider";
 import { Search, SlidersHorizontal, X } from "lucide-react";
+import { HotelCard } from "@/components/HotelCard";
 
 const Marketplace = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,7 +15,7 @@ const Marketplace = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   // Basic filtering and sorting functionality
-  const filteredHotels = hotels.filter(hotel => {
+  const filteredHotels = hotels.filter((hotel: HotelListing) => {
     // Filter by search query
     const matchesSearch = hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          hotel.location.toLowerCase().includes(searchQuery.toLowerCase());

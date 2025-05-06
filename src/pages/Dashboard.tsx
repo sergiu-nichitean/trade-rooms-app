@@ -171,7 +171,7 @@ const Dashboard = () => {
                       Expand your portfolio with more exclusive hotel stays
                     </p>
                     <Button asChild>
-                      <Link to="/marketplace">Browse Marketplace</Link>
+                      <Link to="/search">Search for Hotels</Link>
                     </Button>
                   </Card>
                 </div>
@@ -185,7 +185,7 @@ const Dashboard = () => {
                     You haven't purchased any hotel tokens yet. Browse our marketplace to find exclusive deals on premium hotel stays.
                   </p>
                   <Button asChild>
-                    <Link to="/marketplace">Browse Marketplace</Link>
+                  <Link to="/search">Search for Hotels</Link>
                   </Button>
                 </div>
               )}

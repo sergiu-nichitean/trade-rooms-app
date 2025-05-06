@@ -12,39 +12,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import MintHotelCard from "@/components/MintHotelCard";
+import { HotelListing } from "@/data/hotels";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import axios from "axios";
-
-interface HotelListing {
-  id: string;
-  name: string;
-  location: string;
-  description: string;
-  price: number;
-  tokenPrice: number;
-  rating: number;
-  imageUrl: string;
-  amenities: string[];
-  availableDates: { start: string; end: string }[];
-  tokenSupply: number;
-  tokensSold: number;
-  discount: number;
-}
-
-interface HotelSearchResponse {
-  hotel_id: string;
-  hotel_name: string;
-  city_name: string;
-  address: string;
-  room_id: string;
-  room_name: string;
-  rate_plan_id: string;
-  price: number;
-  currency: string;
-  board_code: string;
-  is_instant_confirm: boolean;
-}
 
 const SearchResults = () => {
   const location = useLocation();
@@ -98,42 +69,20 @@ const SearchResults = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.get<HotelSearchResponse[]>('http://127.0.0.1:8000/api/search/', {
+      // TODO: this is duplicated in Search.tsx
+      const response = await axios.get<HotelListing[]>(`http://127.0.0.1:8000/api/search`, {
         params: {
           location: searchQuery,
-          check_in: format(dateFrom, 'yyyy-MM-dd'),
-          check_out: format(dateTo, 'yyyy-MM-dd'),
-          'occupancy[rooms]': rooms,
-          'occupancy[adults]': adults
+          check_in: dateFrom ? format(dateFrom, 'yyyy-MM-dd') : undefined,
+          check_out: dateTo ? format(dateTo, 'yyyy-MM-dd') : undefined,
+          occupancy: { rooms, adults, children }
         },
         headers: {
-          'accept': 'application/json',
-          'Authorization': 'Token 0c7386a2f405130adab66fd958508f639008abce',
-          'X-CSRFToken': 'mpXltTFrSWSB4vlSLgOuqjD6MEOFSTKaQx1gSEwxFejBg5YA3U4tLiNPLTEci9SO'
+          'Authorization': 'Token c1017ff4c218631488836c3cb9e9f26987f0f1b6'
         }
       });
 
-      // Transform the API response to match our hotel data structure
-      const transformedHotels = response.data.map(hotel => ({
-        id: hotel.hotel_id,
-        name: hotel.hotel_name,
-        location: `${hotel.city_name}, ${hotel.address}`,
-        description: `${hotel.room_name} - ${hotel.board_code}`,
-        price: hotel.price,
-        tokenPrice: hotel.price * 0.8, // Example conversion to token price
-        rating: 4.5, // Default rating since it's not in the API response
-        imageUrl: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80", // Default image
-        amenities: ["Free WiFi", "Air Conditioning", "Room Service"],
-        availableDates: [{
-          start: format(dateFrom, 'yyyy-MM-dd'),
-          end: format(dateTo, 'yyyy-MM-dd')
-        }],
-        tokenSupply: 100,
-        tokensSold: 50,
-        discount: 20
-      }));
-
-      setHotels(transformedHotels);
+      setHotels(response.data);
     } catch (error) {
       console.error('Error searching hotels:', error);
       setError("Failed to search hotels. Please try again.");
@@ -144,28 +93,30 @@ const SearchResults = () => {
 
   // Filter and sort hotels
   const filteredHotels = hotels.filter((hotel: HotelListing) => {
-    const matchesSearch = hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         hotel.location.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesPrice = hotel.tokenPrice >= priceRange[0] && hotel.tokenPrice <= priceRange[1];
-    const matchesRating = ratingFilter ? hotel.rating >= ratingFilter : true;
-    const matchesRoomType = roomTypeFilter.length > 0 ? 
-      roomTypeFilter.some(type => hotel.description.toLowerCase().includes(type.toLowerCase())) : true;
-    const matchesAmenities = amenitiesFilter.length > 0 ? 
-      amenitiesFilter.every(amenity => hotel.amenities.includes(amenity)) : true;
+    console.log('hotel', hotel);
+    const matchesSearch = hotel.hotel_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         hotel.city_name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesPrice = hotel.price >= priceRange[0] && hotel.price <= priceRange[1];
+    // const matchesRating = ratingFilter ? hotel.rating >= ratingFilter : true;
+    // const matchesRoomType = roomTypeFilter.length > 0 ? 
+    //   roomTypeFilter.some(type => hotel.description.toLowerCase().includes(type.toLowerCase())) : true;
+    // const matchesAmenities = amenitiesFilter.length > 0 ? 
+    //   amenitiesFilter.every(amenity => hotel.amenities.includes(amenity)) : true;
     
-    return matchesSearch && matchesPrice && matchesRating && matchesRoomType && matchesAmenities;
+    // return matchesSearch && matchesPrice && matchesRating && matchesRoomType && matchesAmenities;
+    return matchesSearch && matchesPrice;
   });
 
   const sortedHotels = [...filteredHotels].sort((a: HotelListing, b: HotelListing) => {
     switch (sortBy) {
       case "price-low":
-        return a.tokenPrice - b.tokenPrice;
+        return a.price - b.price;
       case "price-high":
-        return b.tokenPrice - a.tokenPrice;
-      case "rating":
-        return b.rating - a.rating;
-      case "discount":
-        return b.discount - a.discount;
+        return b.price - a.price;
+      // case "rating":
+      //   return b.rating - a.rating;
+      // case "discount":
+      //   return b.discount - a.discount;
       default:
         return 0;
     }

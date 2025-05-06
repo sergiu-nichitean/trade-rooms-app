@@ -410,7 +410,7 @@ const HowItWorks = () => {
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Button asChild size="lg" className="bg-solana-gradient hover:opacity-90">
-                  <Link to="/marketplace">Browse Marketplace</Link>
+                  <Link to="/search">Search for Hotels</Link>
                 </Button>
                 <Button asChild variant="outline" size="lg">
                   <Link to="/contact">Contact Us</Link>

@@ -10,7 +10,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchResults from "@/pages/SearchResults";
 import MintHotel from "@/pages/MintHotel";
-import Marketplace from "@/pages/Marketplace";
 import NotFound from "@/pages/NotFound";
 import Index from "./pages/Index";
 import HotelDetail from "./pages/HotelDetail";
@@ -40,7 +39,6 @@ const App = () => (
                   <Route path="/search_results" element={<SearchResults />} />
                   <Route path="/hotel/:id" element={<HotelDetail />} />
                   <Route path="/mint_hotel/:id" element={<MintHotel />} />
-                  <Route path="/marketplace" element={<Marketplace />} />
                   <Route path="/" element={<Index />} />
                   <Route path="/search" element={<Search />} />
                   <Route path="/dashboard" element={<Dashboard />} />

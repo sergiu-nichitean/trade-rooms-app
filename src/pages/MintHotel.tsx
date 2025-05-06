@@ -115,7 +115,7 @@ const MintHotel = () => {
             <h1 className="text-2xl font-bold mb-4">Hotel Not Found</h1>
             <p className="text-muted-foreground mb-6">{error || "The hotel you're looking for doesn't exist or has been removed."}</p>
             <Button asChild>
-              <Link to="/marketplace">Browse Marketplace</Link>
+              <Link to="/search">Search for Hotels</Link>
             </Button>
           </div>
         </main>
@@ -492,7 +492,7 @@ const MintHotel = () => {
           </div>
           <DialogFooter className="flex flex-col gap-2">
             <Button asChild className="w-full">
-              <Link to="/marketplace">View in Marketplace</Link>
+              <Link to="/search">Search for Hotels</Link>
             </Button>
             <Button variant="outline" asChild className="w-full">
               <Link to="/dashboard">Go to Dashboard</Link>

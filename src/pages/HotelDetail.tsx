@@ -21,15 +21,15 @@ const HotelDetail = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <main className="flex-1 container py-12">
-          <Link to="/marketplace" className="flex items-center text-muted-foreground mb-6 hover:text-foreground transition-colors">
+          <Link to="/search" className="flex items-center text-muted-foreground mb-6 hover:text-foreground transition-colors">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to marketplace
+            Search for Hotels
           </Link>
           <div className="text-center py-12">
             <h1 className="text-2xl font-bold mb-4">Hotel Not Found</h1>
             <p className="text-muted-foreground mb-6">The hotel you're looking for doesn't exist or has been removed.</p>
             <Button asChild>
-              <Link to="/marketplace">Browse Marketplace</Link>
+            <Link to="/search">Search for Hotels</Link>
             </Button>
           </div>
         </main>

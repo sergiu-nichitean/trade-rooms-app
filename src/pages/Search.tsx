@@ -25,14 +25,15 @@ const Search = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get<HotelListing[]>(`/api/hotels/search`, {
+      const response = await axios.get<HotelListing[]>(`http://127.0.0.1:8000/api/search`, {
         params: {
-          query: destination,
-          dateFrom: dateFrom ? format(dateFrom, 'yyyy-MM-dd') : undefined,
-          dateTo: dateTo ? format(dateTo, 'yyyy-MM-dd') : undefined,
-          rooms,
-          adults,
-          children
+          location: destination,
+          check_in: dateFrom ? format(dateFrom, 'yyyy-MM-dd') : undefined,
+          check_out: dateTo ? format(dateTo, 'yyyy-MM-dd') : undefined,
+          occupancy: { rooms, adults, children }
+        },
+        headers: {
+          'Authorization': 'Token c1017ff4c218631488836c3cb9e9f26987f0f1b6'
         }
       });
       

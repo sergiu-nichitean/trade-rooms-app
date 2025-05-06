@@ -1,70 +1,38 @@
 # Trade Rooms App
 
-A modern web application for booking and trading hotel stays using NFTs on the Solana blockchain.
+A decentralized hotel booking platform built with React, TypeScript, and Solana blockchain integration.
 
 ## Features
 
-- 🏨 Hotel Search and Booking
-- 🎫 NFT Marketplace for Hotel Stays
-- 💳 Secure Payment Processing
-- 🔐 Wallet Integration
-- 📱 Responsive Design
-- 🎨 Modern UI with shadcn/ui
+- Hotel search and filtering
+- Real-time room availability
+- Token-based hotel room ownership
+- Solana blockchain integration for secure transactions
+- Responsive design for all devices
 
-## Project Structure
+## Tech Stack
 
-```
-src/
-├── components/           # Reusable UI components
-│   ├── ui/              # shadcn/ui components
-│   ├── HotelCard.tsx    # Hotel listing card component
-│   ├── Navbar.tsx       # Navigation bar
-│   └── Footer.tsx       # Footer component
-├── pages/               # Page components
-│   ├── Home.tsx         # Landing page
-│   ├── Marketplace.tsx  # NFT marketplace
-│   ├── HotelDetail.tsx  # Hotel details page
-│   ├── BookingDetail.tsx # Booking details page
-│   ├── Search.tsx       # Search page
-│   ├── SearchResults.tsx # Search results page
-│   ├── Dashboard.tsx    # User dashboard
-│   ├── HowItWorks.tsx   # How it works page
-│   ├── Blog.tsx         # Blog listing
-│   ├── BlogPost.tsx     # Individual blog post
-│   ├── Signup.tsx       # Signup page
-│   └── NotFound.tsx     # 404 page
-├── data/                # Mock data and types
-│   ├── hotels.ts        # Hotel data
-│   └── blog.ts          # Blog data
-├── contexts/            # React contexts
-│   └── WalletContext.tsx # Wallet connection context
-├── App.tsx              # Main application component
-└── main.tsx             # Application entry point
-```
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- Shadcn UI
+- Solana Web3.js
+- Axios
 
-## Technologies Used
-
-- ⚡ Vite - Next Generation Frontend Tooling
-- ⚛️ React - A JavaScript library for building user interfaces
-- 📘 TypeScript - JavaScript with syntax for types
-- 🎨 Tailwind CSS - A utility-first CSS framework
-- 🎭 shadcn/ui - Beautifully designed components
-- 🔗 Solana Web3 - Solana blockchain integration
-- 📱 React Router - Declarative routing for React
-
-## Getting Started
-
-### Prerequisites
+## Prerequisites
 
 - Node.js (v16 or higher)
-- npm (v7 or higher)
+- npm or yarn
+- Solana wallet (e.g., Phantom)
+- Python 3.8+ (for backend API)
 
-### Installation
+## Getting Started
 
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd trade-rooms-app
+cd frontend-app
 ```
 
 2. Install dependencies:
@@ -72,48 +40,105 @@ cd trade-rooms-app
 npm install
 ```
 
-3. Start the development server:
+3. Create a `.env` file in the root directory:
+```env
+VITE_API_URL=http://127.0.0.1:8000
+VITE_SOLANA_RPC_URL=https://distinguished-fragrant-emerald.solana-mainnet.quiknode.pro/33a309dd8517f81615706b1f55b2bdb3641258cb/
+```
+
+4. Start the development server:
 ```bash
 npm run dev
 ```
 
-The application will be available at `http://localhost:8080`
+The app will be available at `http://localhost:8081`
 
-## Development
+## API Integration
 
-### Available Scripts
+The app integrates with a REST API for hotel data. The API endpoints include:
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run format` - Format code with Prettier
-
-### Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```env
-VITE_SOLANA_RPC_URL=your_solana_rpc_url
-VITE_MARKETPLACE_PROGRAM_ID=your_program_id
+### Hotel Details
+```bash
+GET /api/hotels/{hotel_id}/
+Headers:
+  - accept: application/json
+  - Authorization: Token <your-token>
 ```
 
-## Deployment
+Example response:
+```json
+{
+  "id": 4,
+  "hotel_id": "LON001",
+  "hotel_name": "London Bridge Hotel",
+  "city_name": "London",
+  "country_code": "GB",
+  "address": "10 London Bridge St, London SE1 9SG",
+  "telephone": "+44-20-7555-0123",
+  "longitude": "-0.088097",
+  "latitude": "51.504756",
+  "star": 4,
+  "images": [],
+  "amenities": [],
+  "room_types": [],
+  "rooms": [
+    {
+      "id": 13,
+      "room_id": "LON001_R001",
+      "room_name": "Deluxe Double",
+      "max_occupancy": 2,
+      "room_size": 30,
+      "window": 1,
+      "remarks": "City view, King bed",
+      "rate_plans": [
+        {
+          "id": 21,
+          "rate_plan_id": "LON001_R001_RO",
+          "board_code": "RO",
+          "allotment": 5,
+          "price": 150,
+          "currency": "USD",
+          "is_instant_confirm": true,
+          "latest_change_time": null
+        }
+      ]
+    }
+  ]
+}
+```
 
-The application can be deployed to various platforms:
+## Project Structure
 
-1. **Vercel** (Recommended)
-   - Install Vercel CLI: `npm i -g vercel`
-   - Run `vercel` to deploy
+```
+src/
+├── components/     # Reusable UI components
+├── pages/         # Page components
+├── hooks/         # Custom React hooks
+├── lib/           # Utility functions
+├── data/          # Mock data and constants
+└── types/         # TypeScript type definitions
+```
 
-2. **Netlify**
-   - Connect your repository to Netlify
-   - Set build command: `npm run build`
-   - Set publish directory: `dist`
+## Key Features
 
-3. **GitHub Pages**
-   - Run `npm run build`
-   - Push the `dist` folder to the `gh-pages` branch
+### Hotel Search
+- Location-based search
+- Date selection
+- Guest count and room type filtering
+- Price range filtering
+- Rating filtering
+
+### Hotel Details
+- Comprehensive hotel information
+- Room availability and pricing
+- Amenities and facilities
+- Location and contact details
+
+### Token Minting
+- Solana blockchain integration
+- USDC payment processing
+- Token ownership verification
+- Transaction history
 
 ## Contributing
 
@@ -125,4 +150,8 @@ The application can be deployed to various platforms:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For support, email support@traderooms.com or join our Discord community.

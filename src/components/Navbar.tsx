@@ -32,10 +32,6 @@ export const Navbar = () => {
             <LayoutDashboard className="h-4 w-4" />
             Dashboard
           </Link>
-          <Link to="/marketplace" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
-            <Store className="h-4 w-4" />
-            Marketplace
-          </Link>
           <HashLink to="/#how-it-works" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
             <HelpCircle className="h-4 w-4" />
             How It Works
@@ -66,10 +62,6 @@ export const Navbar = () => {
               <Link to="/dashboard" className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
                 <LayoutDashboard className="h-4 w-4" />
                 Dashboard
-              </Link>
-              <Link to="/marketplace" className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
-                <Store className="h-4 w-4" />
-                Marketplace
               </Link>
               <Link to="/how-it-works" className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
                 <HelpCircle className="h-4 w-4" />

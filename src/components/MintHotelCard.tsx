@@ -35,7 +35,7 @@ export const MintHotelCard: React.FC<MintHotelCardProps> = ({ hotel }) => {
         <p className="text-sm line-clamp-2 mb-4">{hotel.description}</p>
         
         <div className="flex flex-wrap gap-2 mb-4">
-          {hotel.amenities.slice(0, 3).map((amenity, index) => (
+          {/* {hotel.amenities.slice(0, 3).map((amenity, index) => (
             <Badge key={index} variant="secondary" className="font-normal text-xs">
               {amenity}
             </Badge>
@@ -44,14 +44,14 @@ export const MintHotelCard: React.FC<MintHotelCardProps> = ({ hotel }) => {
             <Badge variant="secondary" className="font-normal text-xs">
               +{hotel.amenities.length - 3} more
             </Badge>
-          )}
+          )} */}
         </div>
 
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-muted-foreground" />
             <span className="text-xs text-muted-foreground">
-                Available from {new Date(hotel.availableDates[0].start).toLocaleDateString()}
+                {/* Available from {new Date(hotel.availableDates[0].start).toLocaleDateString()} */}
             </span>
           </div>
           

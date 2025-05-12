@@ -75,7 +75,7 @@ const MintHotel = () => {
         const response = await axios.get<HotelResponse>(`http://127.0.0.1:8000/api/hotels/${id}/`, {
           headers: {
             'accept': 'application/json',
-            'Authorization': 'Token 0c7386a2f405130adab66fd958508f639008abce'
+            'Authorization': `Token ${import.meta.env.VITE_BACKEND_API_TOKEN}`
           }
         });
         setHotel(response.data);

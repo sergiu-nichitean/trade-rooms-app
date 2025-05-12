@@ -16,6 +16,7 @@ import { HotelListing } from "@/data/hotels";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import axios from "axios";
+import { searchHotels } from "@/lib/api";
 
 const SearchResults = () => {
   const location = useLocation();
@@ -69,20 +70,16 @@ const SearchResults = () => {
     setIsLoading(true);
 
     try {
-      // TODO: this is duplicated in Search.tsx
-      const response = await axios.get<HotelListing[]>(`http://127.0.0.1:8000/api/search`, {
-        params: {
-          location: searchQuery,
-          check_in: dateFrom ? format(dateFrom, 'yyyy-MM-dd') : undefined,
-          check_out: dateTo ? format(dateTo, 'yyyy-MM-dd') : undefined,
-          occupancy: { rooms, adults, children }
-        },
-        headers: {
-          'Authorization': 'Token c1017ff4c218631488836c3cb9e9f26987f0f1b6'
-        }
+      const searchResults = await searchHotels({
+        location: searchQuery,
+        dateFrom,
+        dateTo,
+        rooms,
+        adults,
+        children
       });
 
-      setHotels(response.data);
+      setHotels(searchResults);
     } catch (error) {
       console.error('Error searching hotels:', error);
       setError("Failed to search hotels. Please try again.");

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +10,7 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon, Search as SearchIcon, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HotelListing } from "@/data/hotels";
+import { searchHotels } from "@/lib/api";
 
 const Search = () => {
   const [destination, setDestination] = useState("");
@@ -25,21 +25,18 @@ const Search = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get<HotelListing[]>(`http://127.0.0.1:8000/api/search`, {
-        params: {
-          location: destination,
-          check_in: dateFrom ? format(dateFrom, 'yyyy-MM-dd') : undefined,
-          check_out: dateTo ? format(dateTo, 'yyyy-MM-dd') : undefined,
-          occupancy: { rooms, adults, children }
-        },
-        headers: {
-          'Authorization': 'Token c1017ff4c218631488836c3cb9e9f26987f0f1b6'
-        }
+      const searchResults = await searchHotels({
+        location: destination,
+        dateFrom,
+        dateTo,
+        rooms,
+        adults,
+        children
       });
       
       navigate('/search_results', { 
         state: { 
-          searchResults: response.data,
+          searchResults,
           searchParams: {
             destination,
             dateFrom,

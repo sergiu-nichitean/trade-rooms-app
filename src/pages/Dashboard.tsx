@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useWallet } from '@solana/wallet-adapter-react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,21 +8,100 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { hotels } from "@/data/hotels";
 import { Input } from "@/components/ui/input";
-import { CalendarDays, Check, CreditCard, ExternalLink, HandCoins, Hotel, RefreshCw, Send, User, Wallet } from "lucide-react";
+import { CalendarDays, Check, CreditCard, ExternalLink, HandCoins, Hotel, RefreshCw, Send, User, Wallet, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
+
+interface TokenAsset {
+  interface: string;
+  id: string;
+  content: {
+    json_uri: string;
+    files: {
+      uri: string;
+      cdn_uri: string;
+      mime: string;
+    }[];
+  };
+  ownership: {
+    owner: string;
+    delegate: string | null;
+  };
+  grouping: {
+    group_key: string;
+    group_value: string;
+  }[];
+}
+
+interface UserToken {
+  id: string;
+  hotelId: string;
+  qty: number;
+  purchaseDate: string;
+  status: string;
+}
 
 const Dashboard = () => {
-  // Mock data
-  const [userTokens, setUserTokens] = useState([
-    { id: "1", hotelId: "2", qty: 2, purchaseDate: "2025-01-15", status: "active" },
-    { id: "2", hotelId: "5", qty: 1, purchaseDate: "2025-02-03", status: "active" },
-  ]);
-  
+  const [userTokens, setUserTokens] = useState<UserToken[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [currentToken, setCurrentToken] = useState<{ id: string, hotelId: string } | null>(null);
   const [transferEmail, setTransferEmail] = useState("");
   
+  const { publicKey } = useWallet();
   const toast = useToast();
+
+  useEffect(() => {
+    const fetchUserTokens = async () => {
+      if (!publicKey) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await axios.post(
+          import.meta.env.VITE_RPC_ENDPOINT,
+          {
+            'jsonrpc': '2.0',
+            'id': import.meta.env.VITE_RPC_CALL_ID,
+            'method': 'getAssetsByOwner',
+            'params': {
+                'ownerAddress': publicKey.toString(),
+                'page': 1,
+                'limit': 100
+            }
+          }
+        );
+
+        // Filter tokens that belong to our collection
+        const tradeRoomTokens = response.data.result.items.filter((item: TokenAsset) => 
+          item.grouping.some(g => 
+            g.group_key === "collection" && 
+            g.group_value === import.meta.env.VITE_TRADE_ROOMS_COLLECTION_MINT
+          )
+        );
+
+        // Transform the tokens into our format
+        const formattedTokens: UserToken[] = tradeRoomTokens.map((token: TokenAsset) => ({
+          id: token.id,
+          hotelId: token.content.json_uri.split('/').pop()?.replace('.json', '') || '',
+          qty: 1, // Each NFT represents 1 night
+          purchaseDate: new Date().toISOString(), // We could store this in the NFT metadata
+          status: 'active'
+        }));
+
+        setUserTokens(formattedTokens);
+      } catch (error) {
+        console.error('Error fetching tokens:', error);
+        setError('Failed to load your tokens. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserTokens();
+  }, [publicKey]);
 
   const handleRedeem = () => {
     if (!currentToken) return;
@@ -94,7 +174,27 @@ const Dashboard = () => {
             
             {/* My Tokens Tab */}
             <TabsContent value="my-tokens">
-              {userTokens.length > 0 ? (
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                    <p className="text-muted-foreground">Loading your tokens...</p>
+                  </div>
+                </div>
+              ) : error ? (
+                <div className="text-center py-12 bg-muted/30 rounded-lg border">
+                  <div className="rounded-full bg-destructive/10 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <AlertCircle className="h-8 w-8 text-destructive" />
+                  </div>
+                  <h3 className="text-lg font-medium mb-2">Error Loading Tokens</h3>
+                  <p className="text-muted-foreground max-w-md mx-auto mb-6">
+                    {error}
+                  </p>
+                  <Button onClick={() => window.location.reload()}>
+                    Try Again
+                  </Button>
+                </div>
+              ) : userTokens.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {userTokens.map(token => {
                     const hotel = hotels.find(h => h.id === token.hotelId);

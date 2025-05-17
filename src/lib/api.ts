@@ -18,6 +18,11 @@ interface CreateBookingParams {
   image: string;
 }
 
+interface RedeemTokenParams {
+  name: string;
+  email: string;
+}
+
 export const searchHotels = async (params: SearchParams): Promise<HotelListing[]> => {
   const response = await axios.get<HotelListing[]>(`http://127.0.0.1:8000/api/search`, {
     params: {
@@ -41,6 +46,20 @@ export const searchHotels = async (params: SearchParams): Promise<HotelListing[]
 export const createBooking = async (params: CreateBookingParams) => {
   const response = await axios.post(
     'http://127.0.0.1:8000/api/bookings',
+    params,
+    {
+      headers: {
+        'Authorization': `Token ${import.meta.env.VITE_BACKEND_API_TOKEN}`
+      }
+    }
+  );
+  
+  return response.data;
+}; 
+
+export const redeemToken = async (tokenId: string, params: RedeemTokenParams) => {
+  const response = await axios.put(
+    `http://127.0.0.1:8000/api/bookings/${tokenId}`,
     params,
     {
       headers: {

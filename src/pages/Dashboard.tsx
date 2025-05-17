@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { CalendarDays, Check, CreditCard, ExternalLink, HandCoins, Hotel, RefreshCw, Send, User, Wallet, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import { redeemToken } from "@/lib/api";
 
 interface TokenAsset {
   interface: string;
@@ -48,9 +49,11 @@ const Dashboard = () => {
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [currentToken, setCurrentToken] = useState<{ id: string, hotelId: string } | null>(null);
   const [transferEmail, setTransferEmail] = useState("");
+  const [transferName, setTransferName] = useState("");
+  const [isRedeeming, setIsRedeeming] = useState(false);
   
   const { publicKey } = useWallet();
-  const toast = useToast();
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchUserTokens = async () => {
@@ -103,19 +106,36 @@ const Dashboard = () => {
     fetchUserTokens();
   }, [publicKey]);
 
-  const handleRedeem = () => {
+  const handleRedeem = async () => {
     if (!currentToken) return;
     
-    // Simulate transfer
-    setUserTokens(prev => prev.filter(token => token.id !== currentToken.id));
-    
-    setShowTransferDialog(false);
-    setTransferEmail("");
-    
-    toast.toast({
-      title: "Token Redeemed Successfully",
-      description: `Your token has been redeemed. You will receive an email with your reservation details.`,
-    });
+    setIsRedeeming(true);
+    try {
+      await redeemToken(currentToken.id, {
+        name: transferName,
+        email: transferEmail
+      });
+      
+      // Update local state only after successful API call
+      setUserTokens(prev => prev.filter(token => token.id !== currentToken.id));
+      setShowTransferDialog(false);
+      setTransferEmail("");
+      setTransferName("");
+      
+      toast({
+        title: "Token Redeemed Successfully",
+        description: "Your token has been redeemed. You will receive an email with your reservation details.",
+      });
+    } catch (error) {
+      console.error('Error redeeming token:', error);
+      toast({
+        title: "Failed to Redeem Token",
+        description: "There was an error redeeming your token. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsRedeeming(false);
+    }
   };
 
   return (
@@ -439,7 +459,11 @@ const Dashboard = () => {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Full Name</label>
-              <Input placeholder="John Doe" />
+              <Input 
+                placeholder="John Doe" 
+                value={transferName}
+                onChange={(e) => setTransferName(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Email</label>
@@ -458,15 +482,26 @@ const Dashboard = () => {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowTransferDialog(false)}>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowTransferDialog(false)}
+              disabled={isRedeeming}
+            >
               Cancel
             </Button>
             <Button 
               onClick={handleRedeem}
-              disabled={!transferEmail || !transferEmail.includes('@')}
+              disabled={!transferEmail || !transferEmail.includes('@') || !transferName || isRedeeming}
               className="bg-solana-gradient hover:opacity-90"
             >
-              Redeem Token
+              {isRedeeming ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Redeeming...
+                </>
+              ) : (
+                'Redeem Token'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

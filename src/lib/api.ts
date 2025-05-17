@@ -11,6 +11,13 @@ interface SearchParams {
   children: number;
 }
 
+interface CreateBookingParams {
+  receiverAddress: string;
+  name: string;
+  description: string;
+  image: string;
+}
+
 export const searchHotels = async (params: SearchParams): Promise<HotelListing[]> => {
   const response = await axios.get<HotelListing[]>(`http://127.0.0.1:8000/api/search`, {
     params: {
@@ -27,6 +34,20 @@ export const searchHotels = async (params: SearchParams): Promise<HotelListing[]
       'Authorization': `Token ${import.meta.env.VITE_BACKEND_API_TOKEN}`
     }
   });
+  
+  return response.data;
+}; 
+
+export const createBooking = async (params: CreateBookingParams) => {
+  const response = await axios.post(
+    'http://127.0.0.1:8000/api/bookings',
+    params,
+    {
+      headers: {
+        'Authorization': `Token ${import.meta.env.VITE_BACKEND_API_TOKEN}`
+      }
+    }
+  );
   
   return response.data;
 }; 

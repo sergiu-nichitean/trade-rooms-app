@@ -15,6 +15,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
+import { createBooking } from "@/lib/api";
 
 interface Room {
   id: number;
@@ -147,7 +148,7 @@ const MintHotel = () => {
     setTransactionStatus('processing');
 
     try {
-      const connection = new Connection("https://distinguished-fragrant-emerald.solana-mainnet.quiknode.pro/33a309dd8517f81615706b1f55b2bdb3641258cb/", "confirmed");
+      const connection = new Connection(import.meta.env.VITE_RPC_ENDPOINT, "confirmed");
       
       // Get the associated token accounts
       const fromTokenAccount = await getAssociatedTokenAddress(
@@ -185,6 +186,15 @@ const MintHotel = () => {
       const signature = await sendTransaction(transaction, connection);
 
       setTransactionStatus('success');
+
+      // Create booking in backend
+      await createBooking({
+        receiverAddress: publicKey.toString(),
+        name: hotel.hotel_name,
+        description: `${hotel.star}-star hotel in ${hotel.city_name}, ${hotel.country_code}. ${hotel.address}`,
+        image: hotel.images[0] || "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
+      });
+
       toast.toast({
         title: "Transaction Successful",
         description: `Your hotel token has been minted successfully!`,

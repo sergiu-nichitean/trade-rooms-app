@@ -32,7 +32,7 @@ A decentralized hotel booking platform built with React, TypeScript, and Solana 
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd frontend-app
+cd trade-rooms-app
 ```
 
 2. Install dependencies:
@@ -42,8 +42,14 @@ npm install
 
 3. Create a `.env` file in the root directory:
 ```env
-VITE_API_URL=http://127.0.0.1:8000
-VITE_SOLANA_RPC_URL=https://distinguished-fragrant-emerald.solana-mainnet.quiknode.pro/33a309dd8517f81615706b1f55b2bdb3641258cb/
+# Backend API configuration
+VITE_API_URL=                     # URL of the backend API (e.g., http://localhost:8000)
+VITE_BACKEND_API_TOKEN=           # Authentication token for the backend API
+
+# Solana blockchain configuration
+VITE_SOLANA_RPC_URL=              # Solana RPC endpoint URL (e.g., https://api.mainnet-beta.solana.com)
+VITE_RPC_CALL_ID=                 # Arbitrary ID string for the get getAssetsByOwner RPC call
+VITE_TRADE_ROOMS_COLLECTION_MINT= # Mint address of the TradeRooms NFT collection
 ```
 
 4. Start the development server:

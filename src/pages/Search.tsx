@@ -6,11 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { format, addDays, addYears, isBefore, isAfter } from "date-fns";
 import { Calendar as CalendarIcon, Search as SearchIcon, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HotelListing } from "@/data/hotels";
 import { searchHotels } from "@/lib/api";
+import { toast } from "sonner";
 
 const Search = () => {
   const [destination, setDestination] = useState("");
@@ -23,7 +24,92 @@ const Search = () => {
 
   const navigate = useNavigate();
 
+  // Date validation helpers
+  const today = new Date();
+  const maxDate = addYears(today, 1);
+  const minStayDuration = 1; // minimum nights
+  const maxTotalGuests = 8;
+  const maxChildrenPerRoom = 2;
+
+  const validateSearch = () => {
+    // Destination validation
+    if (!destination.trim()) {
+      toast.error("Please enter a destination");
+      return false;
+    }
+
+    if (destination.trim().length < 2) {
+      toast.error("Destination must be at least 2 characters long");
+      return false;
+    }
+
+    if (destination.trim().length > 100) {
+      toast.error("Destination is too long");
+      return false;
+    }
+
+    // Date validation
+    if (!dateFrom) {
+      toast.error("Please select check-in date");
+      return false;
+    }
+
+    if (!dateTo) {
+      toast.error("Please select check-out date");
+      return false;
+    }
+
+    if (isBefore(dateFrom, today)) {
+      toast.error("Check-in date cannot be in the past");
+      return false;
+    }
+
+    if (isAfter(dateFrom, maxDate)) {
+      toast.error("Check-in date cannot be more than 1 year in advance");
+      return false;
+    }
+
+    if (dateTo < dateFrom) {
+      toast.error("Check-out date cannot be earlier than check-in date");
+      return false;
+    }
+
+    const nights = Math.ceil((dateTo.getTime() - dateFrom.getTime()) / (1000 * 60 * 60 * 24));
+    if (nights < minStayDuration) {
+      toast.error(`Minimum stay duration is ${minStayDuration} night`);
+      return false;
+    }
+
+    // Guest validation
+    const totalGuests = adults + children;
+    if (totalGuests > maxTotalGuests) {
+      toast.error(`Maximum ${maxTotalGuests} guests allowed`);
+      return false;
+    }
+
+    if (totalGuests > rooms * 4) {
+      toast.error("Maximum 4 guests per room");
+      return false;
+    }
+
+    if (adults < rooms) {
+      toast.error("At least one adult required per room");
+      return false;
+    }
+
+    if (children > rooms * maxChildrenPerRoom) {
+      toast.error(`Maximum ${maxChildrenPerRoom} children per room`);
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSearch = async () => {
+    if (!validateSearch()) {
+      return;
+    }
+
     try {
       const searchResults = await searchHotels({
         location: destination,
@@ -36,7 +122,7 @@ const Search = () => {
       
       navigate('/search_results', { 
         state: { 
-          searchResults,
+          searchResults: searchResults || [],
           searchParams: {
             destination,
             dateFrom,
@@ -44,12 +130,13 @@ const Search = () => {
             rooms,
             adults,
             children
-          }
+          },
+          noResults: !searchResults || searchResults.length === 0
         }
       });
     } catch (error) {
       console.error('Error searching hotels:', error);
-      // You might want to show an error message to the user here
+      toast.error("Failed to search hotels. Please try again.");
     }
   };
 
@@ -68,6 +155,7 @@ const Search = () => {
                   onChange={(e) => setDestination(e.target.value)}
                   placeholder="Enter a destination or property"
                   className="w-full h-14 pl-12 pr-4 text-lg rounded-xl"
+                  maxLength={100}
                 />
               </div>
 
@@ -92,6 +180,9 @@ const Search = () => {
                       selected={dateFrom}
                       onSelect={setDateFrom}
                       initialFocus
+                      disabled={(date) => isBefore(date, today) || isAfter(date, maxDate)}
+                      fromDate={today}
+                      toDate={maxDate}
                     />
                   </PopoverContent>
                 </Popover>
@@ -116,6 +207,13 @@ const Search = () => {
                       selected={dateTo}
                       onSelect={setDateTo}
                       initialFocus
+                      disabled={(date) => 
+                        !dateFrom || 
+                        isBefore(date, addDays(dateFrom, minStayDuration)) || 
+                        isAfter(date, maxDate)
+                      }
+                      fromDate={dateFrom ? addDays(dateFrom, minStayDuration) : undefined}
+                      toDate={maxDate}
                     />
                   </PopoverContent>
                 </Popover>
@@ -153,6 +251,7 @@ const Search = () => {
                             size="icon"
                             className="h-8 w-8 rounded-full"
                             onClick={() => setRooms(rooms + 1)}
+                            disabled={adults + children >= maxTotalGuests}
                           >
                             +
                           </Button>
@@ -169,8 +268,8 @@ const Search = () => {
                             variant="outline"
                             size="icon"
                             className="h-8 w-8 rounded-full"
-                            onClick={() => setAdults(Math.max(1, adults - 1))}
-                            disabled={adults <= 1}
+                            onClick={() => setAdults(Math.max(rooms, adults - 1))}
+                            disabled={adults <= rooms}
                           >
                             -
                           </Button>
@@ -180,6 +279,7 @@ const Search = () => {
                             size="icon"
                             className="h-8 w-8 rounded-full"
                             onClick={() => setAdults(adults + 1)}
+                            disabled={adults + children >= maxTotalGuests}
                           >
                             +
                           </Button>
@@ -207,6 +307,7 @@ const Search = () => {
                             size="icon"
                             className="h-8 w-8 rounded-full"
                             onClick={() => setChildren(children + 1)}
+                            disabled={children >= rooms * maxChildrenPerRoom || adults + children >= maxTotalGuests}
                           >
                             +
                           </Button>

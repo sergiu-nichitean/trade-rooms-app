@@ -529,23 +529,35 @@ const SearchResults = () => {
                 </p>
               </div>
               
-              {/* Hotel Grid */}
-              {sortedHotels.length > 0 ? (
+              {/* No Results Message */}
+              {(location.state?.noResults || sortedHotels.length === 0) && !isLoading && (
+                <div className="text-center py-12">
+                  <h3 className="text-xl font-semibold mb-2">No hotels found</h3>
+                  <p className="text-muted-foreground mb-4">
+                    We couldn't find any hotels matching your search criteria. Try adjusting your filters or search for a different location.
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate('/search')}
+                  >
+                    Modify Search
+                  </Button>
+                </div>
+              )}
+
+              {/* Results Grid */}
+              {!location.state?.noResults && sortedHotels.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {sortedHotels.map((hotel) => (
-                    <MintHotelCard key={hotel.id} hotel={hotel} />
+                    <MintHotelCard key={hotel.hotel_id} hotel={hotel} />
                   ))}
                 </div>
-              ) : (
+              )}
+
+              {/* Loading State */}
+              {isLoading && (
                 <div className="text-center py-12">
-                  <h3 className="text-lg font-medium mb-2">No results found</h3>
-                  <p className="text-muted-foreground mb-4">Try adjusting your search or filters</p>
-                  <Button 
-                    variant="outline"
-                    onClick={handleResetFilters}
-                  >
-                    Reset all filters
-                  </Button>
+                  <p className="text-muted-foreground">Searching for hotels...</p>
                 </div>
               )}
             </div>

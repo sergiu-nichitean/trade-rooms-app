@@ -8,9 +8,29 @@ import * as React from "react";
 
 interface HotelDetailCardProps {
   hotel: HotelListing;
+  dateFrom?: Date;
+  dateTo?: Date;
+  rooms?: number;
+  adults?: number;
+  children?: number;
 }
 
-export const HotelDetailCard: React.FC<HotelDetailCardProps> = ({ hotel }) => {
+export const HotelDetailCard: React.FC<HotelDetailCardProps> = ({ 
+  hotel,
+  dateFrom,
+  dateTo,
+  rooms,
+  adults,
+  children
+}) => {
+  const searchParams = {
+    dateFrom,
+    dateTo,
+    rooms,
+    adults,
+    children
+  };
+  
   return (
     <Card className="overflow-hidden hotel-card border-0 rounded-xl">
       <div className="relative">
@@ -67,9 +87,14 @@ export const HotelDetailCard: React.FC<HotelDetailCardProps> = ({ hotel }) => {
       </CardContent>
 
       <CardFooter className="p-4 pt-0 gap-2">
-          <Button asChild className="w-full bg-solana-gradient hover:opacity-90">
-            <Link to={`/mint_hotel/${hotel.hotel_id}`}>View Details</Link>
-          </Button>
+        <Button asChild className="w-full bg-solana-gradient hover:opacity-90">
+          <Link 
+            to={`/hotel/${hotel.hotel_id}`}
+            state={searchParams}
+          >
+            View Details
+          </Link>
+        </Button>
       </CardFooter>
     </Card>
   );

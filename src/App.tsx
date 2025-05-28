@@ -11,7 +11,6 @@ import Footer from "@/components/Footer";
 import SearchResults from "@/pages/SearchResults";
 import HotelDetail from "@/pages/HotelDetail";
 import NotFound from "@/pages/NotFound";
-import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import HowItWorks from "./pages/HowItWorks";
 import Blog from "./pages/Blog";
@@ -37,8 +36,7 @@ const App = () => (
                 <Routes>
                   <Route path="/search_results" element={<SearchResults />} />
                   <Route path="/hotel/:id" element={<HotelDetail />} />
-                  <Route path="/" element={<Index />} />
-                  <Route path="/search" element={<Search />} />
+                  <Route path="/" element={<Search />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/how-it-works" element={<HowItWorks />} />
                   <Route path="/blog" element={<Blog />} />

@@ -11,7 +11,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import HotelDetailCard from "@/components/HotelDetailCard";
+import { HotelDetailCard } from "../components/HotelDetailCard";
 import { HotelListing } from "@/data/hotels";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -551,7 +551,15 @@ const SearchResults = () => {
               {!location.state?.noResults && sortedHotels.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {sortedHotels.map((hotel) => (
-                    <HotelDetailCard key={hotel.hotel_id} hotel={hotel} />
+                    <HotelDetailCard 
+                      key={hotel.hotel_id} 
+                      hotel={hotel}
+                      dateFrom={dateFrom}
+                      dateTo={dateTo}
+                      rooms={rooms}
+                      adults={adults}
+                      children={children}
+                    />
                   ))}
                 </div>
               )}

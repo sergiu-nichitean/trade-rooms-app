@@ -63,7 +63,7 @@ const Dashboard = () => {
 
       try {
         const response = await axios.post(
-          import.meta.env.VITE_RPC_ENDPOINT,
+          import.meta.env.VITE_SOLANA_RPC_URL,
           {
             'jsonrpc': '2.0',
             'id': import.meta.env.VITE_RPC_CALL_ID,

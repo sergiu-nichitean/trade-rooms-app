@@ -23,6 +23,47 @@ interface RedeemTokenParams {
   email: string;
 }
 
+export interface HotelResponse {
+  id: number;
+  hotel_id: string;
+  hotel_name: string;
+  city_name: string;
+  country_code: string;
+  address: string;
+  telephone: string;
+  longitude: string;
+  latitude: string;
+  star: number;
+  images: string[];
+  amenities: string[];
+  room_types: string[];
+  rooms: Room[];
+}
+
+export interface Room {
+  name: string;
+  roomId: string;
+  rates: RatePlan[];
+}
+
+export interface RatePlan {
+  ratePlanId: string;
+  boardCode: string;
+  allotment: number;
+  price: number;
+  isInstantConfirm: boolean;
+}
+
+interface HotelSearchParams {
+  check_in: string;
+  check_out: string;
+  occupancy: {
+    adults: number;
+    rooms: number;
+    children: number;
+  };
+}
+
 export const searchHotels = async (params: SearchParams): Promise<HotelListing[]> => {
   const response = await axios.get<HotelListing[]>(`http://127.0.0.1:8000/api/search`, {
     params: {
@@ -63,6 +104,38 @@ export const redeemToken = async (tokenId: string, params: RedeemTokenParams) =>
     params,
     {
       headers: {
+        'Authorization': `Token ${import.meta.env.VITE_BACKEND_API_TOKEN}`
+      }
+    }
+  );
+  
+  return response.data;
+}; 
+
+export const getHotelDetails = async (id: string, params?: HotelSearchParams): Promise<HotelResponse> => {
+  const queryParams = new URLSearchParams();
+  
+  if (params) {
+    // Convert dates to YYYY-MM-DD format
+    const checkInDate = new Date(params.check_in);
+    const checkOutDate = new Date(params.check_out);
+    
+    if (isNaN(checkInDate.getTime()) || isNaN(checkOutDate.getTime())) {
+      throw new Error('Invalid date format');
+    }
+    
+    queryParams.append('check_in', format(checkInDate, 'yyyy-MM-dd'));
+    queryParams.append('check_out', format(checkOutDate, 'yyyy-MM-dd'));
+    queryParams.append('occupancy[adults]', params.occupancy.adults.toString());
+    queryParams.append('occupancy[rooms]', params.occupancy.rooms.toString());
+    queryParams.append('occupancy[children]', params.occupancy.children.toString());
+  }
+
+  const response = await axios.get<HotelResponse>(
+    `http://127.0.0.1:8000/api/hotels/${id}/${queryParams.toString() ? `?${queryParams.toString()}` : ''}`,
+    {
+      headers: {
+        'accept': 'application/json',
         'Authorization': `Token ${import.meta.env.VITE_BACKEND_API_TOKEN}`
       }
     }

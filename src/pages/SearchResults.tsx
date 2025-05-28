@@ -11,7 +11,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import MintHotelCard from "@/components/MintHotelCard";
+import HotelDetailCard from "@/components/HotelDetailCard";
 import { HotelListing } from "@/data/hotels";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -39,6 +39,7 @@ const SearchResults = () => {
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
   const [roomTypeFilter, setRoomTypeFilter] = useState<string[]>([]);
   const [amenitiesFilter, setAmenitiesFilter] = useState<string[]>([]);
+  const [noResults, setNoResults] = useState(false);
 
   // Only set initial hotels if coming from search page
   useEffect(() => {
@@ -80,6 +81,7 @@ const SearchResults = () => {
       });
 
       setHotels(searchResults);
+      setNoResults(!searchResults || searchResults.length === 0);
     } catch (error) {
       console.error('Error searching hotels:', error);
       setError("Failed to search hotels. Please try again.");
@@ -549,7 +551,7 @@ const SearchResults = () => {
               {!location.state?.noResults && sortedHotels.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {sortedHotels.map((hotel) => (
-                    <MintHotelCard key={hotel.hotel_id} hotel={hotel} />
+                    <HotelDetailCard key={hotel.hotel_id} hotel={hotel} />
                   ))}
                 </div>
               )}

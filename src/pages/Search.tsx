@@ -119,7 +119,7 @@ const Search = () => {
         adults,
         children
       });
-      
+      console.log('noResults', !searchResults || searchResults.length === 0);
       navigate('/search_results', { 
         state: { 
           searchResults: searchResults || [],

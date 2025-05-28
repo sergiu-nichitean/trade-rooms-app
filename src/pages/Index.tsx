@@ -8,7 +8,6 @@ import HotelCard from "@/components/HotelCard";
 import WhoIsItFor from "@/components/WhoIsItFor";
 import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
-import { hotels } from "@/data/hotels";
 
 const Index = () => {
   // Show just 3 featured hotels on the home page

@@ -6,11 +6,11 @@ import { HotelListing } from "@/data/hotels";
 import { Star, Calendar } from "lucide-react";
 import * as React from "react";
 
-interface MintHotelCardProps {
+interface HotelDetailCardProps {
   hotel: HotelListing;
 }
 
-export const MintHotelCard: React.FC<MintHotelCardProps> = ({ hotel }) => {
+export const HotelDetailCard: React.FC<HotelDetailCardProps> = ({ hotel }) => {
   return (
     <Card className="overflow-hidden hotel-card border-0 rounded-xl">
       <div className="relative">
@@ -75,4 +75,4 @@ export const MintHotelCard: React.FC<MintHotelCardProps> = ({ hotel }) => {
   );
 };
 
-export default MintHotelCard;
+export default HotelDetailCard;

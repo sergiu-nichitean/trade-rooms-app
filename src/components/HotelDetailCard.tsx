@@ -80,7 +80,7 @@ export const HotelDetailCard: React.FC<HotelDetailCardProps> = ({
           <div className="ml-auto">
             <p className="text-xs text-muted-foreground">Price per night</p>
             <p className="font-bold text-lg">
-              {hotel.currency} {hotel.price}
+              ${hotel.price.toFixed(2)}
             </p>
           </div>
         </div>

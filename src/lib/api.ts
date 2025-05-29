@@ -23,6 +23,21 @@ interface RedeemTokenParams {
   email: string;
 }
 
+interface CheckBookingParams {
+  hotelId: string;
+  checkIn: string;
+  checkOut: string;
+  occupancy: {
+    rooms: number;
+    adults: number;
+    childrenAges: number[];
+  };
+  roomId: string;
+  ratePlanId: string;
+  currency: string;
+  totalPrice: number;
+}
+
 export interface HotelResponse {
   id: number;
   hotel_id: string;
@@ -136,6 +151,20 @@ export const getHotelDetails = async (id: string, params?: HotelSearchParams): P
     {
       headers: {
         'accept': 'application/json',
+        'Authorization': `Token ${import.meta.env.VITE_BACKEND_API_TOKEN}`
+      }
+    }
+  );
+  
+  return response.data;
+}; 
+
+export const checkBooking = async (params: CheckBookingParams) => {
+  const response = await axios.post(
+    'http://127.0.0.1:8000/api/bookings/check/',
+    params,
+    {
+      headers: {
         'Authorization': `Token ${import.meta.env.VITE_BACKEND_API_TOKEN}`
       }
     }

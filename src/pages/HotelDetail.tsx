@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createBooking, getHotelDetails } from "@/lib/api";
+import { createBooking, getHotelDetails, checkBooking } from "@/lib/api";
 import type { HotelResponse, Room, RatePlan } from "@/lib/api";
 
 const USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
@@ -123,10 +123,46 @@ const HotelDetail = () => {
       return;
     }
 
+    if (!selectedRate) {
+      toast.toast({
+        title: "No Room Selected",
+        description: "Please select a room and rate plan to proceed.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     setTransactionStatus('processing');
 
     try {
+      // First check if the booking is available
+      const checkResponse = await checkBooking({
+        hotelId: hotel.hotel_id,
+        checkIn: new Date(location.state?.dateFrom).toISOString().split('T')[0],
+        checkOut: new Date(location.state?.dateTo).toISOString().split('T')[0],
+        occupancy: {
+          rooms: parseInt(location.state?.rooms),
+          adults: parseInt(location.state?.adults),
+          childrenAges: Array(parseInt(location.state?.children)).fill(7) // Default to age 7 for all children
+        },
+        roomId: selectedRate.room.roomId,
+        ratePlanId: selectedRate.plan.ratePlanId,
+        currency: "USD",
+        totalPrice: totalPrice
+      });
+
+      if (checkResponse.price === null) {
+        toast.toast({
+          title: "Rate Unavailable",
+          description: "The rate is no longer available.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        setTransactionStatus('error');
+        return;
+      }
+
       const connection = new Connection(import.meta.env.VITE_SOLANA_RPC_URL, "confirmed");
       
       // Get the associated token accounts
@@ -155,7 +191,7 @@ const HotelDetail = () => {
       });
 
       // Set the amount in the instruction data
-      const amount = totalPrice * 1_000_000; // USDC has 6 decimals
+      const amount = checkResponse.price * 1_000_000; // USDC has 6 decimals
       const amountBuffer = Buffer.alloc(8);
       amountBuffer.writeBigUInt64LE(BigInt(amount));
       transferInstruction.data.set(amountBuffer, 1);

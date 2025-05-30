@@ -17,7 +17,7 @@ const Search = () => {
   const [destination, setDestination] = useState("");
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
-  const [rooms, setRooms] = useState(1);
+  const rooms = 1; // Hardcoded to 1 room
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [isGuestsOpen, setIsGuestsOpen] = useState(false);
@@ -87,17 +87,17 @@ const Search = () => {
       return false;
     }
 
-    if (totalGuests > rooms * 4) {
+    if (totalGuests > 4) { // Changed from rooms * 4 to just 4 since rooms is always 1
       toast.error("Maximum 4 guests per room");
       return false;
     }
 
-    if (adults < rooms) {
+    if (adults < 1) { // Changed from rooms to 1 since rooms is always 1
       toast.error("At least one adult required per room");
       return false;
     }
 
-    if (children > rooms * maxChildrenPerRoom) {
+    if (children > maxChildrenPerRoom) { // Changed from rooms * maxChildrenPerRoom to just maxChildrenPerRoom
       toast.error(`Maximum ${maxChildrenPerRoom} children per room`);
       return false;
     }
@@ -233,33 +233,6 @@ const Search = () => {
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium">Room</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 rounded-full"
-                            onClick={() => setRooms(Math.max(1, rooms - 1))}
-                            disabled={rooms <= 1}
-                          >
-                            -
-                          </Button>
-                          <span className="w-8 text-center">{rooms}</span>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 rounded-full"
-                            onClick={() => setRooms(rooms + 1)}
-                            disabled={adults + children >= maxTotalGuests}
-                          >
-                            +
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div>
                           <p className="font-medium">Adults</p>
                           <p className="text-sm text-muted-foreground">Ages 18 or above</p>
                         </div>
@@ -307,7 +280,7 @@ const Search = () => {
                             size="icon"
                             className="h-8 w-8 rounded-full"
                             onClick={() => setChildren(children + 1)}
-                            disabled={children >= rooms * maxChildrenPerRoom || adults + children >= maxTotalGuests}
+                            disabled={children >= maxChildrenPerRoom || adults + children >= maxTotalGuests}
                           >
                             +
                           </Button>

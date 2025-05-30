@@ -29,7 +29,7 @@ const SearchResults = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [dateFrom, setDateFrom] = useState<Date | undefined>(searchParams.dateFrom);
   const [dateTo, setDateTo] = useState<Date | undefined>(searchParams.dateTo);
-  const [rooms, setRooms] = useState(searchParams.rooms || 1);
+  const rooms = 1; // Hardcoded to 1 room
   const [adults, setAdults] = useState(searchParams.adults || 2);
   const [children, setChildren] = useState(searchParams.children || 0);
   const [isGuestsOpen, setIsGuestsOpen] = useState(false);
@@ -375,29 +375,6 @@ const SearchResults = () => {
                         </PopoverTrigger>
                         <PopoverContent className="w-80 p-4" align="start">
                           <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="font-medium">Rooms</p>
-                                <p className="text-sm text-muted-foreground">Number of rooms</p>
-                              </div>
-                              <div className="flex items-center gap-4">
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  onClick={() => setRooms(Math.max(1, rooms - 1))}
-                                >
-                                  -
-                                </Button>
-                                <span>{rooms}</span>
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  onClick={() => setRooms(rooms + 1)}
-                                >
-                                  +
-                                </Button>
-                              </div>
-                            </div>
                             <div className="flex items-center justify-between">
                               <div>
                                 <p className="font-medium">Adults</p>

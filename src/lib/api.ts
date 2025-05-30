@@ -13,9 +13,19 @@ interface SearchParams {
 
 interface CreateBookingParams {
   receiverAddress: string;
-  name: string;
-  description: string;
-  image: string;
+  roomName: string;
+  checkIn: string;
+  checkOut: string;
+  hotelId: string;
+  roomId: string;
+  ratePlanId: string;
+  boardCode: string;
+  currency: string;
+  totalPrice: number;
+  guestCount: {
+    adults: number;
+    childrenAges: number[];
+  };
 }
 
 interface RedeemTokenParams {

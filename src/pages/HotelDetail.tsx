@@ -205,9 +205,19 @@ const HotelDetail = () => {
       // Create booking in backend
       await createBooking({
         receiverAddress: publicKey.toString(),
-        name: hotel.hotel_name,
-        description: `${hotel.star}-star hotel in ${hotel.city_name}, ${hotel.country_code}. ${hotel.address}`,
-        image: hotel.images[0] || "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
+        roomName: selectedRate.room.name,
+        checkIn: new Date(location.state?.dateFrom).toISOString().split('T')[0],
+        checkOut: new Date(location.state?.dateTo).toISOString().split('T')[0],
+        hotelId: hotel.hotel_id,
+        roomId: selectedRate.room.roomId,
+        ratePlanId: selectedRate.plan.ratePlanId,
+        boardCode: selectedRate.plan.boardCode,
+        currency: "USD",
+        totalPrice: checkResponse.price,
+        guestCount: {
+          adults: parseInt(location.state?.adults),
+          childrenAges: Array(parseInt(location.state?.children)).fill(7)
+        }
       });
 
       toast.toast({

@@ -35,7 +35,7 @@ export const HotelDetailCard: React.FC<HotelDetailCardProps> = ({
     <Card className="overflow-hidden hotel-card border-0 rounded-xl">
       <div className="relative">
         <img 
-          src={`https://picsum.photos/800/600?random=${hotel.hotel_id}`} 
+          src={hotel.primary_image_url || `https://picsum.photos/800/600?random=${hotel.hotel_id}`} 
           alt={hotel.hotel_name}
           className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {

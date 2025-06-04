@@ -264,7 +264,7 @@ const HotelDetail = () => {
               {/* Hotel Images */}
               <div className="relative rounded-xl overflow-hidden border">
                 <img 
-                  src={hotel.images[0] || "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"} 
+                  src={hotel.images[0]?.image_url || "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"} 
                   alt={hotel.hotel_name}
                   className="w-full h-[400px] object-cover"
                 />

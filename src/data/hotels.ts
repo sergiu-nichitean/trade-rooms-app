@@ -10,4 +10,5 @@ export interface HotelListing {
     rate_plan_id: string;
     board_code: string;
     is_instant_confirm: boolean;
+    primary_image_url: string;
 }

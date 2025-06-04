@@ -48,6 +48,12 @@ interface CheckBookingParams {
   totalPrice: number;
 }
 
+export interface HotelImage {
+  id: number;
+  image_url: string;
+  is_primary: boolean;
+}
+
 export interface HotelResponse {
   id: number;
   hotel_id: string;
@@ -59,7 +65,7 @@ export interface HotelResponse {
   longitude: string;
   latitude: string;
   star: number;
-  images: string[];
+  images: HotelImage[];
   amenities: string[];
   room_types: string[];
   rooms: Room[];

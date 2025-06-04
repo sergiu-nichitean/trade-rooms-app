@@ -117,7 +117,7 @@ export const searchHotels = async (params: SearchParams): Promise<HotelListing[]
 
 export const createBooking = async (params: CreateBookingParams) => {
   const response = await axios.post(
-    'http://127.0.0.1:8000/api/bookings',
+    'http://127.0.0.1:8000/api/bookings/',
     params,
     {
       headers: {

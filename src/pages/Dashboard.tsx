@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { CalendarDays, Check, CreditCard, ExternalLink, HandCoins, Hotel, RefreshCw, Send, User, Wallet, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
-import { redeemToken } from "@/lib/api";
+import { redeemToken, getBookings, Booking } from "@/lib/api";
 
 interface TokenAsset {
   interface: string;
@@ -33,20 +33,12 @@ interface TokenAsset {
   }[];
 }
 
-interface UserToken {
-  id: string;
-  hotelId: string;
-  qty: number;
-  purchaseDate: string;
-  status: string;
-}
-
 const Dashboard = () => {
-  const [userTokens, setUserTokens] = useState<UserToken[]>([]);
+  const [userBookings, setUserBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
-  const [currentToken, setCurrentToken] = useState<{ id: string, hotelId: string } | null>(null);
+  const [currentBooking, setCurrentBooking] = useState<Booking | null>(null);
   const [transferEmail, setTransferEmail] = useState("");
   const [transferName, setTransferName] = useState("");
   const [isRedeeming, setIsRedeeming] = useState(false);
@@ -75,7 +67,7 @@ const Dashboard = () => {
             }
           }
         );
-
+        console.log('getAssetsByOwner response', response.data);
         // Filter tokens that belong to our collection
         const tradeRoomTokens = response.data.result.items.filter((item: TokenAsset) => 
           item.grouping.some(g => 
@@ -84,16 +76,13 @@ const Dashboard = () => {
           )
         );
 
-        // Transform the tokens into our format
-        const formattedTokens: UserToken[] = tradeRoomTokens.map((token: TokenAsset) => ({
-          id: token.id,
-          hotelId: token.content.json_uri.split('/').pop()?.replace('.json', '') || '',
-          qty: 1, // Each NFT represents 1 night
-          purchaseDate: new Date().toISOString(), // We could store this in the NFT metadata
-          status: 'active'
-        }));
+        // Get mint addresses from tokens
+        const mintAddresses = tradeRoomTokens.map((token: TokenAsset) => token.id);
 
-        setUserTokens(formattedTokens);
+        // Fetch bookings for these tokens
+        const bookings = await getBookings(mintAddresses);
+        console.log('bookings', bookings);
+        setUserBookings(bookings);
       } catch (error) {
         console.error('Error fetching tokens:', error);
         setError('Failed to load your tokens. Please try again later.');
@@ -106,17 +95,17 @@ const Dashboard = () => {
   }, [publicKey]);
 
   const handleRedeem = async () => {
-    if (!currentToken) return;
+    if (!currentBooking) return;
     
     setIsRedeeming(true);
     try {
-      await redeemToken(currentToken.id, {
+      await redeemToken(currentBooking.mint_address, {
         name: transferName,
         email: transferEmail
       });
       
       // Update local state only after successful API call
-      setUserTokens(prev => prev.filter(token => token.id !== currentToken.id));
+      setUserBookings(prev => prev.filter(booking => booking.mint_address !== currentBooking.mint_address));
       setShowTransferDialog(false);
       setTransferEmail("");
       setTransferName("");
@@ -164,25 +153,18 @@ const Dashboard = () => {
                     <Wallet className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">$1,078.00</div>
+                    <div className="text-2xl font-bold">
+                      ${userBookings.length > 0 ? userBookings.reduce((sum, booking) => sum + parseFloat(booking.total_price), 0).toFixed(2) : '0.00'}
+                    </div>
                     <p className="text-xs text-muted-foreground">
-                      3 tokens across 2 properties
+                      {userBookings.length === 0 ? (
+                        'No bookings yet'
+                      ) : (
+                        `${userBookings.length} ${userBookings.length === 1 ? 'booking' : 'bookings'} across ${new Set(userBookings.map(b => b.hotel.hotel_id)).size} properties`
+                      )}
                     </p>
                   </CardContent>
                 </Card>
-                
-                {/* <Card>
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Total Savings</CardTitle>
-                    <HandCoins className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">$236.00</div>
-                    <p className="text-xs text-muted-foreground">
-                      Compared to retail pricing
-                    </p>
-                  </CardContent>
-                </Card> */}
                 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -190,7 +172,14 @@ const Dashboard = () => {
                     <CalendarDays className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">3</div>
+                    <div className="text-2xl font-bold">
+                      {userBookings.reduce((sum, booking) => {
+                        const checkIn = new Date(booking.check_in_date);
+                        const checkOut = new Date(booking.check_out_date);
+                        const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+                        return sum + nights;
+                      }, 0)}
+                    </div>
                     <p className="text-xs text-muted-foreground">
                       Across premium properties
                     </p>
@@ -201,18 +190,18 @@ const Dashboard = () => {
               {/* Main Tabs */}
               <Tabs defaultValue="my-tokens">
                 <TabsList className="grid grid-cols-3 mb-8">
-                  <TabsTrigger value="my-tokens">My Tokens</TabsTrigger>
+                  <TabsTrigger value="my-tokens">My Bookings</TabsTrigger>
                   <TabsTrigger value="transactions">Transactions</TabsTrigger>
                   <TabsTrigger value="account">Account</TabsTrigger>
                 </TabsList>
                 
-                {/* My Tokens Tab */}
+                {/* My Bookings Tab */}
                 <TabsContent value="my-tokens">
                   {isLoading ? (
                     <div className="text-center py-12">
                       <div className="flex flex-col items-center gap-4">
                         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-                        <p className="text-muted-foreground">Loading your tokens...</p>
+                        <p className="text-muted-foreground">Loading your bookings...</p>
                       </div>
                     </div>
                   ) : error ? (
@@ -220,7 +209,7 @@ const Dashboard = () => {
                       <div className="rounded-full bg-destructive/10 w-16 h-16 flex items-center justify-center mx-auto mb-4">
                         <AlertCircle className="h-8 w-8 text-destructive" />
                       </div>
-                      <h3 className="text-lg font-medium mb-2">Error Loading Tokens</h3>
+                      <h3 className="text-lg font-medium mb-2">Error Loading Bookings</h3>
                       <p className="text-muted-foreground max-w-md mx-auto mb-6">
                         {error}
                       </p>
@@ -228,79 +217,79 @@ const Dashboard = () => {
                         Try Again
                       </Button>
                     </div>
-                  ) : userTokens.length > 0 ? (
+                  ) : userBookings.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {userTokens.map(token => {
-                        const hotel = hotels.find(h => h.hotel_id === token.hotelId);
-                        if (!hotel) return null;
-                        
-                        return (
-                          <Card key={token.id} className="overflow-hidden">
-                            <div className="relative">
-                              <img 
-                                src={`https://picsum.photos/800/600?random=${hotel.hotel_id}`}
-                                alt={hotel.hotel_name}
-                                className="h-40 w-full object-cover"
-                              />
-                              <Badge className="absolute top-3 left-3 bg-primary border-0 font-medium">
-                                {token.qty} {token.qty === 1 ? 'Night' : 'Nights'}
-                              </Badge>
+                      {userBookings.map(booking => (
+                        <Card key={booking.id} className="overflow-hidden">
+                          <div className="relative">
+                            <img 
+                              src={booking.hotel.images.find(img => img.is_primary)?.image_url || `https://picsum.photos/800/600?random=${booking.hotel.hotel_id}`}
+                              alt={booking.hotel.hotel_name}
+                              className="h-40 w-full object-cover"
+                            />
+                            <Badge className="absolute top-3 left-3 bg-primary border-0 font-medium">
+                              {Math.ceil((new Date(booking.check_out_date).getTime() - new Date(booking.check_in_date).getTime()) / (1000 * 60 * 60 * 24))} Nights
+                            </Badge>
+                          </div>
+                          
+                          <CardHeader className="pb-2">
+                            <CardTitle>{booking.hotel.hotel_name}</CardTitle>
+                            <CardDescription>{booking.hotel.address}</CardDescription>
+                          </CardHeader>
+                          
+                          <CardContent className="pb-2">
+                            <div className="flex justify-between items-center mb-3 text-sm">
+                              <span className="text-muted-foreground">Total Value:</span>
+                              <span className="font-medium">${booking.total_price}</span>
                             </div>
                             
-                            <CardHeader className="pb-2">
-                              <CardTitle>{hotel.hotel_name}</CardTitle>
-                              <CardDescription>{hotel.address}</CardDescription>
-                            </CardHeader>
+                            <div className="flex justify-between items-center mb-3 text-sm">
+                              <span className="text-muted-foreground">Check-in:</span>
+                              <span>{new Date(booking.check_in_date).toLocaleDateString()}</span>
+                            </div>
                             
-                            <CardContent className="pb-2">
-                              <div className="flex justify-between items-center mb-3 text-sm">
-                                <span className="text-muted-foreground">Token Value:</span>
-                                <span className="font-medium">${hotel.price * token.qty}</span>
-                              </div>
-                              
-                              <div className="flex justify-between items-center mb-3 text-sm">
-                                <span className="text-muted-foreground">Purchase Date:</span>
-                                <span>{new Date(token.purchaseDate).toLocaleDateString()}</span>
-                              </div>
-                              
-                              <div className="flex justify-between items-center text-sm">
-                                <span className="text-muted-foreground">Status:</span>
-                                <Badge variant="outline" className="font-normal capitalize flex items-center gap-1">
-                                  <span className="h-2 w-2 rounded-full bg-green-500"></span>
-                                  {token.status}
-                                </Badge>
-                              </div>
-                            </CardContent>
+                            <div className="flex justify-between items-center mb-3 text-sm">
+                              <span className="text-muted-foreground">Check-out:</span>
+                              <span>{new Date(booking.check_out_date).toLocaleDateString()}</span>
+                            </div>
                             
-                            <CardFooter className="grid grid-cols-2 gap-2">
-                              <Button asChild variant="outline" size="sm">
-                                <Link to={`/booking/${hotel.hotel_id}`}>
-                                  <Hotel className="h-4 w-4 mr-2" />
-                                  Details
-                                </Link>
-                              </Button>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => {
-                                  setCurrentToken({ id: token.id, hotelId: token.hotelId });
-                                  setShowTransferDialog(true);
-                                }}
-                              >
-                                <Send className="h-4 w-4 mr-2" />
-                                Redeem
-                              </Button>
-                            </CardFooter>
-                          </Card>
-                        );
-                      })}
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-muted-foreground">Status:</span>
+                              <Badge variant="outline" className="font-normal capitalize flex items-center gap-1">
+                                <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                                {booking.status}
+                              </Badge>
+                            </div>
+                          </CardContent>
+                          
+                          <CardFooter className="grid grid-cols-2 gap-2">
+                            <Button asChild variant="outline" size="sm">
+                              <Link to={`/booking/${booking.hotel.hotel_id}`}>
+                                <Hotel className="h-4 w-4 mr-2" />
+                                Details
+                              </Link>
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                setCurrentBooking(booking);
+                                setShowTransferDialog(true);
+                              }}
+                            >
+                              <Send className="h-4 w-4 mr-2" />
+                              Redeem
+                            </Button>
+                          </CardFooter>
+                        </Card>
+                      ))}
                       
                       {/* Add More Card */}
                       <Card className="flex flex-col items-center justify-center p-8 h-full border-dashed">
                         <div className="rounded-full bg-primary/10 p-3 mb-4">
                           <Hotel className="h-6 w-6 text-primary" />
                         </div>
-                        <h3 className="font-medium mb-1">Add More Tokens</h3>
+                        <h3 className="font-medium mb-1">Add More Bookings</h3>
                         <p className="text-muted-foreground text-sm text-center mb-4">
                           Expand your portfolio with more exclusive hotel stays
                         </p>
@@ -314,12 +303,12 @@ const Dashboard = () => {
                       <div className="rounded-full bg-primary/10 w-16 h-16 flex items-center justify-center mx-auto mb-4">
                         <Hotel className="h-8 w-8 text-primary" />
                       </div>
-                      <h3 className="text-lg font-medium mb-2">No Tokens Yet</h3>
+                      <h3 className="text-lg font-medium mb-2">No Bookings Yet</h3>
                       <p className="text-muted-foreground max-w-md mx-auto mb-6">
-                        You haven't purchased any hotel tokens yet. Browse our marketplace to find exclusive deals on premium hotel stays.
+                        You haven't made any hotel bookings yet. Browse our marketplace to find exclusive deals on premium hotel stays.
                       </p>
                       <Button asChild>
-                      <Link to="/search">Search for Hotels</Link>
+                        <Link to="/search">Search for Hotels</Link>
                       </Button>
                     </div>
                   )}
@@ -453,21 +442,33 @@ const Dashboard = () => {
       <Dialog open={showTransferDialog} onOpenChange={setShowTransferDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Redeem Hotel Token</DialogTitle>
+            <DialogTitle>Redeem Hotel Booking</DialogTitle>
             <DialogDescription>
-              Redeem your token to use at the hotel. This action cannot be undone.
+              Redeem your booking to use at the hotel. This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           
-          {currentToken && (
+          {currentBooking && (
             <div className="p-4 border rounded-md bg-muted/50 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Hotel:</span>
-                <span>{hotels.find(h => h.hotel_id === currentToken.hotelId)?.hotel_name}</span>
+                <span>{currentBooking.hotel.hotel_name}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="font-medium">Location:</span>
-                <span>{hotels.find(h => h.hotel_id === currentToken.hotelId)?.address}</span>
+                <span>{currentBooking.hotel.address}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Room:</span>
+                <span>{currentBooking.room_name}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Check-in:</span>
+                <span>{new Date(currentBooking.check_in_date).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Check-out:</span>
+                <span>{new Date(currentBooking.check_out_date).toLocaleDateString()}</span>
               </div>
             </div>
           )}
@@ -516,7 +517,7 @@ const Dashboard = () => {
                   Redeeming...
                 </>
               ) : (
-                'Redeem Token'
+                'Redeem Booking'
               )}
             </Button>
           </DialogFooter>

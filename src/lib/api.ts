@@ -95,6 +95,30 @@ interface HotelSearchParams {
   };
 }
 
+export interface Booking {
+  id: number;
+  user: number;
+  hotel: HotelResponse;
+  check_in_date: string;
+  check_out_date: string;
+  number_of_guests: number;
+  total_price: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  underdog_status: string;
+  underdog_error: string | null;
+  bingtrip_status: string;
+  bingtrip_error: string | null;
+  transaction_id: string;
+  nft_id: number;
+  mint_address: string;
+  room_name: string;
+  board_code: string;
+  adults: number;
+  children: number;
+}
+
 export const searchHotels = async (params: SearchParams): Promise<HotelListing[]> => {
   const response = await axios.get<HotelListing[]>(`http://127.0.0.1:8000/api/search`, {
     params: {
@@ -179,6 +203,24 @@ export const checkBooking = async (params: CheckBookingParams) => {
   const response = await axios.post(
     'http://127.0.0.1:8000/api/bookings/check/',
     params,
+    {
+      headers: {
+        'Authorization': `Token ${import.meta.env.VITE_BACKEND_API_TOKEN}`
+      }
+    }
+  );
+  
+  return response.data;
+}; 
+
+export const getBookings = async (mintAddresses: string[]): Promise<Booking[]> => {
+  const queryParams = new URLSearchParams();
+  mintAddresses.forEach(address => {
+    queryParams.append('mint_addresses[]', address);
+  });
+
+  const response = await axios.get<Booking[]>(
+    `http://127.0.0.1:8000/api/bookings/?${queryParams.toString()}`,
     {
       headers: {
         'Authorization': `Token ${import.meta.env.VITE_BACKEND_API_TOKEN}`
